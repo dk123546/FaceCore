@@ -154,6 +154,8 @@ class Log
 
         bool GetLogDB() const { return m_enableLogDB; }
         bool GetLogDBLater() const { return m_enableLogDBLater; }
+		const char* Utf8ToUnicode(const char* input);	
+        const char* UnicodeToUtf8(const char* input);
         void SetLogDB(bool enable) { m_enableLogDB = enable; }
         void SetLogDBLater(bool value) { m_enableLogDBLater = value; }
         bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }

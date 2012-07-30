@@ -1077,3 +1077,40 @@ void Log::outWarden(const char * str, ...)
         va_end(ap);
     }
 }
+const char* Log::Utf8ToUnicode(const char* input)
+{
+    wchar_t * wcharBuf;
+    char * charBuf;
+
+    int len = MultiByteToWideChar(CP_UTF8, 0, input, -1, NULL, 0);
+    wcharBuf = new wchar_t[len];
+
+    MultiByteToWideChar(CP_UTF8, 0, input, -1, wcharBuf, len);
+
+    len = WideCharToMultiByte(CP_ACP, 0, wcharBuf, -1, NULL, 0, NULL, NULL);
+    charBuf = new char[len];
+
+    WideCharToMultiByte(CP_ACP, 0, wcharBuf, -1, charBuf, len, NULL, NULL);
+
+    delete [] wcharBuf;
+    return charBuf;
+}
+
+const char* Log::UnicodeToUtf8(const char* input)
+{
+    wchar_t * wcharBuf;
+    char * charBuf;
+
+    int len = MultiByteToWideChar(CP_ACP, 0, input, -1, NULL, 0);
+    wcharBuf = new wchar_t[len];
+
+    MultiByteToWideChar(CP_ACP, 0, input, -1, wcharBuf, len);
+
+    len = WideCharToMultiByte(CP_UTF8, 0, wcharBuf, -1, NULL, 0, NULL, NULL);
+    charBuf = new char[len];
+
+    WideCharToMultiByte(CP_UTF8, 0, wcharBuf, -1, charBuf, len, NULL, NULL);
+
+    delete [] wcharBuf;
+    return charBuf;
+}
