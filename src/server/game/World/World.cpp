@@ -1130,12 +1130,12 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
     {
         if (dataPath != m_dataPath)
-            sLog->outError("DataDir option can't be changed at worldserver.conf reload, using current value (%s).", m_dataPath.c_str());
+            sLog->outError("DataDir 不能在重载时更改没使用当前配置 (%s).", m_dataPath.c_str());
     }
     else
     {
         m_dataPath = dataPath;
-        sLog->outString("Using DataDir %s", m_dataPath.c_str());
+        sLog->outString("世界：Data 文件目录： %s", m_dataPath.c_str());
     }
 
     m_bool_configs[CONFIG_VMAP_INDOOR_CHECK] = ConfigMgr::GetBoolDefault("vmap.enableIndoorCheck", 0);
@@ -1146,7 +1146,7 @@ void World::LoadConfigSettings(bool reload)
     std::string ignoreSpellIds = ConfigMgr::GetStringDefault("vmap.ignoreSpellIds", "");
 
     if (!enableHeight)
-        sLog->outError("VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
+        sLog->outError("VMap 高度检测关闭！可能会出现怪物飞天等异常现象，强烈建议仅在个人测试服务器上关闭该功能.");
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
@@ -1284,7 +1284,7 @@ void World::SetInitialWorldSettings()
             !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
             !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
     {
-        sLog->outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map/*.vmtree/*.vmtile files in appropriate directories or correct the DataDir value in the worldserver.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
+        sLog->outError("Maps文件目录 '%smaps' 和/或 VMaps 文件目录 '%svmaps'下找不到正确的 *.map 和/或 vmap 文件，请确认您是最新服务端版本，或者请检查您的地图版本是否正确！.", m_dataPath.c_str(), m_dataPath.c_str());
         exit(1);
     }
 
@@ -1296,7 +1296,7 @@ void World::SetInitialWorldSettings()
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
     sLog->outString();
-    sLog->outString("Loading Trinity strings...");
+    sLog->outString("开始加载数据库：");
     if (!sObjectMgr->LoadTrinityStrings())
         exit(1);                                            // Error message displayed in function already
 
@@ -1320,7 +1320,7 @@ void World::SetInitialWorldSettings()
     CharacterDatabase.Execute(stmt);
 
     ///- Load the DBC files
-    sLog->outString("Initialize data stores...");
+    sLog->outString("初始化 DBC 数据引擎...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
@@ -1339,17 +1339,17 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading GameObject models...");
     LoadGameObjectModelList();
 
-    sLog->outString("Loading Script Names...");
+    sLog->outString("加载 脚本名称....");
     sObjectMgr->LoadScriptNames();
 
-    sLog->outString("Loading Instance Template...");
+    sLog->outString("加载 区域框架...");
     sObjectMgr->LoadInstanceTemplate();
 
     // Must be called before `creature_respawn`/`gameobject_respawn` tables
     sLog->outString("Loading instances...");
     sInstanceSaveMgr->LoadInstances();
 
-    sLog->outString("Loading Localization strings...");
+    sLog->outString("加载 本地化词条...");
     uint32 oldMSTime = getMSTime();
     sObjectMgr->LoadCreatureLocales();
     sObjectMgr->LoadGameObjectLocales();
@@ -1365,10 +1365,10 @@ void World::SetInitialWorldSettings()
     sLog->outString(">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 
-    sLog->outString("Loading Page Texts...");
+    sLog->outString("加载 文本数据...");
     sObjectMgr->LoadPageTexts();
 
-    sLog->outString("Loading Game Object Templates...");         // must be after LoadPageTexts
+    sLog->outString("加载 世界物体数据...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
 
     sLog->outString("Loading Spell Rank Data...");
@@ -1383,145 +1383,145 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Spell Learn Skills...");
     sSpellMgr->LoadSpellLearnSkills();                           // must be after LoadSpellRanks
 
-    sLog->outString("Loading Spell Learn Spells...");
+    sLog->outString("加载 职业技能数据...");
     sSpellMgr->LoadSpellLearnSpells();
 
-    sLog->outString("Loading Spell Proc Event conditions...");
+    sLog->outString("加载 技能触发事件...");
     sSpellMgr->LoadSpellProcEvents();
 
     sLog->outString("Loading Spell Proc conditions and data...");
     sSpellMgr->LoadSpellProcs();
 
-    sLog->outString("Loading Spell Bonus Data...");
+    sLog->outString("加载 技能奖励数据...");
     sSpellMgr->LoadSpellBonusess();
 
-    sLog->outString("Loading Aggro Spells Definitions...");
+    sLog->outString("加载 技能目标定义...");
     sSpellMgr->LoadSpellThreats();
 
     sLog->outString("Loading Spell Group Stack Rules...");
     sSpellMgr->LoadSpellGroupStackRules();
 
-    sLog->outString("Loading NPC Texts...");
+    sLog->outString("加载 NPC 对话文本...");
     sObjectMgr->LoadGossipText();
 
     sLog->outString("Loading Enchant Spells Proc datas...");
     sSpellMgr->LoadSpellEnchantProcData();
 
-    sLog->outString("Loading Item Random Enchantments Table...");
+    sLog->outString("加载 物品随机附魔信息...");
     LoadRandomEnchantmentsTable();
 
     sLog->outString("Loading Disables");
     DisableMgr::LoadDisables();                                  // must be before loading quests and items
 
-    sLog->outString("Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
+    sLog->outString("加载 物品信息...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
     sLog->outString("Loading Item set names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemSetNames();
 
-    sLog->outString("Loading Creature Model Based Info Data...");
+    sLog->outString("加载 生物模型基础数据...");
     sObjectMgr->LoadCreatureModelInfo();
 
-    sLog->outString("Loading Equipment templates...");
+    sLog->outString("加载 装备框架...");
     sObjectMgr->LoadEquipmentTemplates();
 
-    sLog->outString("Loading Creature templates...");
+    sLog->outString("加载 生物属性...");
     sObjectMgr->LoadCreatureTemplates();
 
     sLog->outString("Loading Creature template addons...");
     sObjectMgr->LoadCreatureTemplateAddons();
 
-    sLog->outString("Loading Reputation Reward Rates...");
+    sLog->outString("加载 声望奖励等级...");
     sObjectMgr->LoadReputationRewardRate();
 
-    sLog->outString("Loading Creature Reputation OnKill Data...");
+    sLog->outString("加载 生物击杀声望奖励...");
     sObjectMgr->LoadReputationOnKill();
 
-    sLog->outString("Loading Reputation Spillover Data..." );
+    sLog->outString("加载 声望扩展奖励..." );
     sObjectMgr->LoadReputationSpilloverTemplate();
 
-    sLog->outString("Loading Points Of Interest Data...");
+    sLog->outString("加载 特殊地区数据...");
     sObjectMgr->LoadPointsOfInterest();
 
     sLog->outString("Loading Creature Base Stats...");
     sObjectMgr->LoadCreatureClassLevelStats();
 
-    sLog->outString("Loading Creature Data...");
+    sLog->outString("加载 生物刷新点数据...");
     sObjectMgr->LoadCreatures();
 
-    sLog->outString("Loading pet levelup spells...");
+    sLog->outString("加载 宠物升级技能奖励...");
     sSpellMgr->LoadPetLevelupSpellMap();
 
     sLog->outString("Loading pet default spells additional to levelup spells...");
     sSpellMgr->LoadPetDefaultSpells();
 
-    sLog->outString("Loading Creature Addon Data...");
+    sLog->outString("加载 生物扩展数据...");
     sObjectMgr->LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
 
-    sLog->outString("Loading Gameobject Data...");
+    sLog->outString("加载 世界物品信息...");
     sObjectMgr->LoadGameobjects();
 
     sLog->outString("Loading Creature Linked Respawn...");
     sObjectMgr->LoadLinkedRespawn();                             // must be after LoadCreatures(), LoadGameObjects()
 
-    sLog->outString("Loading Weather Data...");
+    sLog->outString("加载 天气系统数据...");
     WeatherMgr::LoadWeatherData();
 
-    sLog->outString("Loading Quests...");
+    sLog->outString("加载 任务信息...");
     sObjectMgr->LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
 
     sLog->outString("Checking Quest Disables");
     DisableMgr::CheckQuestDisables();                           // must be after loading quests
 
-    sLog->outString("Loading Quest POI");
+    sLog->outString("加载 任务 POI ...");
     sObjectMgr->LoadQuestPOI();
 
-    sLog->outString("Loading Quests Relations...");
+    sLog->outString("加载 任务关系数据...");
     sObjectMgr->LoadQuestRelations();                            // must be after quest load
 
-    sLog->outString("Loading Objects Pooling Data...");
+    sLog->outString("加载 物品刷新关系...");
     sPoolMgr->LoadFromDB();
 
-    sLog->outString("Loading Game Event Data...");               // must be after loading pools fully
+    sLog->outString("加载 游戏时间数据...");               // must be after loading pools fully
     sGameEventMgr->LoadFromDB();
 
-    sLog->outString("Loading UNIT_NPC_FLAG_SPELLCLICK Data..."); // must be after LoadQuests
+    sLog->outString("加载 UNIT_NPC_FLAG_SPELLCLICK 数据..."); // must be after LoadQuests
     sObjectMgr->LoadNPCSpellClickSpells();
 
     sLog->outString("Loading Vehicle Template Accessories...");
     sObjectMgr->LoadVehicleTemplateAccessories();                // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
-    sLog->outString("Loading Vehicle Accessories...");
+    sLog->outString("加载 交通数据...");
     sObjectMgr->LoadVehicleAccessories();                       // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
     sLog->outString("Loading Dungeon boss data...");
     sObjectMgr->LoadInstanceEncounters();
 
-    sLog->outString("Loading LFG rewards...");
+    sLog->outString("加载 随机副本奖励...");
     sLFGMgr->LoadRewards();
 
-    sLog->outString("Loading SpellArea Data...");                // must be after quest load
+    sLog->outString("加载 技能区域信息...");                // must be after quest load
     sSpellMgr->LoadSpellAreas();
 
-    sLog->outString("Loading AreaTrigger definitions...");
+    sLog->outString("加载 区域传送触发器...");
     sObjectMgr->LoadAreaTriggerTeleports();
 
     sLog->outString("Loading Access Requirements...");
     sObjectMgr->LoadAccessRequirements();                        // must be after item template load
 
-    sLog->outString("Loading Quest Area Triggers...");
+    sLog->outString("加载 任务区域触发器...");
     sObjectMgr->LoadQuestAreaTriggers();                         // must be after LoadQuests
 
-    sLog->outString("Loading Tavern Area Triggers...");
+    sLog->outString("加载 旅店触发器...");
     sObjectMgr->LoadTavernAreaTriggers();
 
-    sLog->outString("Loading AreaTrigger script names...");
+    sLog->outString("加载 区域触发器脚本名...");
     sObjectMgr->LoadAreaTriggerScripts();
 
-    sLog->outString("Loading Graveyard-zone links...");
+    sLog->outString("加载 墓地数据...");
     sObjectMgr->LoadGraveyardZones();
 
-    sLog->outString("Loading spell pet auras...");
+    sLog->outString("加载 技能宠物光环奖励...");
     sSpellMgr->LoadSpellPetAuras();
 
     sLog->outString("Loading Spell target coordinates...");
@@ -1536,39 +1536,39 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Player Create Data...");
     sObjectMgr->LoadPlayerInfo();
 
-    sLog->outString("Loading Exploration BaseXP Data...");
+    sLog->outString("加载 探索地图经验奖励...");
     sObjectMgr->LoadExplorationBaseXP();
 
-    sLog->outString("Loading Pet Name Parts...");
+    sLog->outString("加载 宠物名称...");
     sObjectMgr->LoadPetNames();
 
     CharacterDatabaseCleaner::CleanDatabase();
 
-    sLog->outString("Loading the max pet number...");
+    sLog->outString("加载 最大宠物数量...");
     sObjectMgr->LoadPetNumber();
 
-    sLog->outString("Loading pet level stats...");
+    sLog->outString("加载 宠物等级属性...");
     sObjectMgr->LoadPetLevelInfo();
 
-    sLog->outString("Loading Player Corpses...");
+    sLog->outString("加载 角色尸体信息s...");
     sObjectMgr->LoadCorpses();
 
-    sLog->outString("Loading Player level dependent mail rewards...");
+    sLog->outString("加载 升级邮件奖励...");
     sObjectMgr->LoadMailLevelRewards();
 
     // Loot tables
     LoadLootTables();
 
-    sLog->outString("Loading Skill Discovery Table...");
+    sLog->outString("加载 辅助技能搜寻信息...");
     LoadSkillDiscoveryTable();
 
-    sLog->outString("Loading Skill Extra Item Table...");
+    sLog->outString("加载 辅助技能扩展数据...");
     LoadSkillExtraItemTable();
 
-    sLog->outString("Loading Skill Fishing base level requirements...");
+    sLog->outString("加载 钓鱼技能需求...");
     sObjectMgr->LoadFishingBaseSkillLevel();
 
-    sLog->outString("Loading Achievements...");
+    sLog->outString("加载 成就数据...");
     sAchievementMgr->LoadAchievementReferenceList();
     sLog->outString("Loading Achievement Criteria Lists...");
     sAchievementMgr->LoadAchievementCriteriaList();
@@ -1588,27 +1588,27 @@ void World::SetInitialWorldSettings()
     ///- Load dynamic data tables from the database
     sLog->outString("Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
-    sLog->outString("Loading Auctions...");
+    sLog->outString("加载 拍卖行...");
     sAuctionMgr->LoadAuctions();
 
     sGuildMgr->LoadGuilds();
 
-    sLog->outString("Loading ArenaTeams...");
+    sLog->outString("加载 竞技场队伍信息...");
     sArenaTeamMgr->LoadArenaTeams();
 
-    sLog->outString("Loading Groups...");
+    sLog->outString("加载 团队信息...");
     sGroupMgr->LoadGroups();
 
-    sLog->outString("Loading ReservedNames...");
+    sLog->outString("加载 重命名信息s...");
     sObjectMgr->LoadReservedPlayersNames();
 
-    sLog->outString("Loading GameObjects for quests...");
+    sLog->outString("加载 任务物体对象...");
     sObjectMgr->LoadGameObjectForQuests();
 
-    sLog->outString("Loading BattleMasters...");
+    sLog->outString("加载 战场指挥官...");
     sBattlegroundMgr->LoadBattleMastersEntry();
 
-    sLog->outString("Loading GameTeleports...");
+    sLog->outString("加载 游戏传送数据...");
     sObjectMgr->LoadGameTele();
 
     sLog->outString("Loading Gossip menu...");
@@ -1617,13 +1617,13 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Gossip menu options...");
     sObjectMgr->LoadGossipMenuItems();
 
-    sLog->outString("Loading Vendors...");
+    sLog->outString("加载 商人信息...");
     sObjectMgr->LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
 
-    sLog->outString("Loading Trainers...");
+    sLog->outString("加载 训练师信息s...");
     sObjectMgr->LoadTrainerSpell();                              // must be after load CreatureTemplate
 
-    sLog->outString("Loading Waypoints...");
+    sLog->outString("加载 路近点信息...");
     sWaypointMgr->Load();
 
     sLog->outString("Loading SmartAI Waypoints...");
@@ -1650,7 +1650,7 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading faction change reputation pairs...");
     sObjectMgr->LoadFactionChangeReputations();
 
-    sLog->outString("Loading GM tickets...");
+    sLog->outString("加载 GM 求助信息...");
     sTicketMgr->LoadTickets();
 
     sLog->outString("Loading GM surveys...");
@@ -1660,7 +1660,7 @@ void World::SetInitialWorldSettings()
     AddonMgr::LoadFromDB();
 
     ///- Handle outdated emails (delete/return)
-    sLog->outString("Returning old mails...");
+    sLog->outString("退回过期邮件...");
     sObjectMgr->ReturnOrDeleteOldMails(false);
 
     sLog->outString("Loading Autobroadcasts...");
@@ -1674,16 +1674,16 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadEventScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadWaypointScripts();
 
-    sLog->outString("Loading Scripts text locales...");      // must be after Load*Scripts calls
+    sLog->outString("加载 本地化脚本文本...");      // must be after Load*Scripts calls
     sObjectMgr->LoadDbScriptStrings();
 
-    sLog->outString("Loading CreatureEventAI Texts...");
+    sLog->outString("加载 CreatureEventAI 文本信息...");
     sEventAIMgr->LoadCreatureEventAI_Texts();
 
-    sLog->outString("Loading CreatureEventAI Summons...");
+    sLog->outString("加载 CreatureEventAI 召唤信息...");
     sEventAIMgr->LoadCreatureEventAI_Summons();
 
-    sLog->outString("Loading CreatureEventAI Scripts...");
+    sLog->outString("加载 CreatureEventAI 脚本信息...");
     sEventAIMgr->LoadCreatureEventAI_Scripts();
 
     sLog->outString("Loading spell script names...");
@@ -1695,7 +1695,7 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    sLog->outString("Initializing Scripts...");
+    sLog->outString("加载脚本库...");
     sScriptMgr->Initialize();
     sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
 
@@ -1709,7 +1709,7 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     ///- Initialize game time and timers
-    sLog->outString("Initialize game time and timers");
+    sLog->outString("初始化世界时间和计时器.");
     m_gameTime = time(NULL);
     m_startTime = m_gameTime;
 
@@ -1743,10 +1743,10 @@ void World::SetInitialWorldSettings()
     Player::InitVisibleBits();
 
     ///- Initialize MapManager
-    sLog->outString("Starting Map System");
+    sLog->outString("初始化 地图系统");
     sMapMgr->Initialize();
 
-    sLog->outString("Starting Game Event system...");
+    sLog->outString("初始化 游戏事件系统...");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
@@ -1762,7 +1762,7 @@ void World::SetInitialWorldSettings()
     sTicketMgr->Initialize();
 
     ///- Initialize Battlegrounds
-    sLog->outString("Starting Battleground System");
+    sLog->outString("初始化 战场系统");
     sBattlegroundMgr->CreateInitialBattlegrounds();
     sBattlegroundMgr->InitAutomaticArenaPointDistribution();
 
@@ -1770,7 +1770,7 @@ void World::SetInitialWorldSettings()
     sLog->outString("Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
 
-    sLog->outString("Loading Transports...");
+    sLog->outString("初始化 交通数据...");
     sMapMgr->LoadTransports();
 
     sLog->outString("Loading Transport NPCs...");
@@ -1783,16 +1783,16 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Warden Action Overrides..." );
     sWardenCheckMgr->LoadWardenOverrides();
 
-    sLog->outString("Deleting expired bans...");
+    sLog->outString("删除过期禁止列表...");
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate <= UNIX_TIMESTAMP() AND unbandate<>bandate");      // One-time query
 
-    sLog->outString("Calculate next daily quest reset time...");
+    sLog->outString("计算下一个日常任务重置时间...");
     InitDailyQuestResetTime();
 
-    sLog->outString("Calculate next weekly quest reset time..." );
+    sLog->outString("计算下一个周长任务重置时间e..." );
     InitWeeklyQuestResetTime();
 
-    sLog->outString("Calculate random battleground reset time..." );
+    sLog->outString("计算下一次随机战场重置时间..." );
     InitRandomBGResetTime();
 
     LoadCharacterNameData();
