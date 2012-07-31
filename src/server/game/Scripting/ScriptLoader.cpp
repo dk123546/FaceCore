@@ -31,6 +31,12 @@ void AddSC_npc_teleport();
 void AddSC_npc_hunterpetvendor();
 // Custom
 void AddSC_DuelReset();
+void AddSC_NPC_Transmogrify();
+void AddSC_Boss_Announcer();
+void AddSC_OnLogin();
+void AddSC_PVP_System();
+void AddSC_cs_world_chat();
+
 //NPC Transport Service
 void AddSC_npc_mount();	
 // Argent Tournament quest scripts
@@ -1286,6 +1292,13 @@ void AddCustomScripts()
     //Hunter Pet Vendor
     AddSC_npc_hunterpetvendor();	
     // Custom
+	AddSC_NPC_Transmogrify();
+    AddSC_Boss_Announcer();
+    AddSC_OnLogin();
+    AddSC_PVP_System();
+    AddSC_cs_world_chat();
+
+
     AddSC_DuelReset();
     AddSC_npc_mount();		
     AddSC_ArgentTournament();

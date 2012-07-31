@@ -14,6 +14,12 @@ set(scripts_STAT_SRCS
   Custom/npc_mount.cpp 
   Custom/argent_tournament.cpp
   Custom/dalaran_squirrel.cpp
+  Custom/Boss_Announce.cpp
+  Custom/dlgg.cpp
+  Custom/world_chat.cpp
+  Custom/pvp_kill.cpp
+  Custom/HHXT.cpp
+
 )
 
 message("  -> Prepared: Custom")

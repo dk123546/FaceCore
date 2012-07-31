@@ -1418,6 +1418,10 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Item set names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemSetNames();
+	// Custom
+    sLog->outString("加载 幻化系统数据...");
+    CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE NOT EXISTS (SELECT 1 FROM item_instance WHERE item_instance.guid = custom_transmogrification.GUID)");
+    sLog->outString();
 
     sLog->outString("加载 生物模型基础数据...");
     sObjectMgr->LoadCreatureModelInfo();
