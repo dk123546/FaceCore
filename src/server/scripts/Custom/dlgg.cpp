@@ -9,7 +9,7 @@ Announce_OnPlayerLogin() : PlayerScript("Announce_OnPlayerLogin") {}
 void OnLogin(Player * player)
 {
 char msg[250];
-sprintf(msg, 250,"|CFF7BBEF7[登陆信息]| 热烈欢迎玩家 % 进入游戏，大家欢迎！",player->GetName());
+sprintf(msg,"|CFF7BBEF7[登陆信息]| 热烈欢迎玩家 % 进入游戏，大家欢迎！",player->GetName());
 sWorld->SendWorldText(SERVER_MSG_STRING, msg);
 }
 }; 
