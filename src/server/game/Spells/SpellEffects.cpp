@@ -494,20 +494,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_PRIEST:
             {
-                // Shadow Word: Death - deals damage equal to damage done to caster
-                if (m_spellInfo->SpellFamilyFlags[1] & 0x2)
-                {
-                    int32 back_damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
-                    back_damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, (uint32)back_damage, SPELL_DIRECT_DAMAGE);
-                    // Pain and Suffering reduces damage
-                    if (AuraEffect* aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, 0))
-                        AddPctN(back_damage, -aurEff->GetAmount());
-
-                    if (back_damage < int32(unitTarget->GetHealth()))
-                        m_caster->CastCustomSpell(m_caster, 32409, &back_damage, 0, 0, true);
-                }
                 // Improved Mind Blast (Mind Blast in shadow form bonus)
-                else if (m_caster->GetShapeshiftForm() == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags[0] & 0x00002000))
+                if (m_caster->GetShapeshiftForm() == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags[0] & 0x00002000))
                 {
                     Unit::AuraEffectList const& ImprMindBlast = m_caster->GetAuraEffectsByType(SPELL_AURA_ADD_FLAT_MODIFIER);
                     for (Unit::AuraEffectList::const_iterator i = ImprMindBlast.begin(); i != ImprMindBlast.end(); ++i)
@@ -2445,7 +2433,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         if (properties->Category == SUMMON_CATEGORY_ALLY)
                         {
-                            summon->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_originalCaster->GetGUID());
+                            summon->SetOwnerGUID(m_originalCaster->GetGUID());
                             summon->setFaction(m_originalCaster->getFaction());
                             summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
                         }
@@ -5347,6 +5335,10 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     if (Creature* creatureTarget = unitTarget->ToCreature())
         if (creatureTarget->isWorldBoss() || creatureTarget->IsDungeonBoss())
             return;
+
+    // Spells with SPELL_EFFECT_KNOCK_BACK(like Thunderstorm) can't knoback target if target has ROOT/STUN
+    if (unitTarget->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+        return;
 
     // Typhoon
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[1] & 0x01000000)

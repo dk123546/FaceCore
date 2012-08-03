@@ -1744,7 +1744,6 @@ void World::SetInitialWorldSettings()
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
-    Player::InitVisibleBits();
 
     ///- Initialize MapManager
     sLog->outString("初始化 地图系统");
